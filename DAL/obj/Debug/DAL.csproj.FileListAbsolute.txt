@@ -1,0 +1,7 @@
+D:\MikitaSerhushou\Custom\HostelApp\DAL\bin\Debug\DAL.dll
+D:\MikitaSerhushou\Custom\HostelApp\DAL\bin\Debug\DAL.pdb
+D:\MikitaSerhushou\Custom\HostelApp\DAL\bin\Debug\Dapper.dll
+D:\MikitaSerhushou\Custom\HostelApp\DAL\bin\Debug\Dapper.xml
+D:\MikitaSerhushou\Custom\HostelApp\DAL\obj\Debug\DAL.csprojResolveAssemblyReference.cache
+D:\MikitaSerhushou\Custom\HostelApp\DAL\obj\Debug\DAL.dll
+D:\MikitaSerhushou\Custom\HostelApp\DAL\obj\Debug\DAL.pdb
