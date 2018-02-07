@@ -20,34 +20,57 @@ namespace DAL.Repositories.Impl
 			if (string.IsNullOrWhiteSpace(connectionString))
 			{
 				throw new ArgumentException("connectionString is Null or Whitespace");
-			}
+			} 
 
 			_connectionString = connectionString;
 		}
 
 		public IList<RoomsDal> GetAll()
 		{
-			var sql = @"SELECT * FROM Rooms AS r JOIN RoomTypes AS rt ON rt.Id = r.RoomTypeId";
-			IList<RoomsDal> roomsCollection = new List<RoomsDal>();
-			using (IDbConnection connection = new SqlConnection(_connectionString))
-			{
-				roomsCollection = connection.Query<RoomsDal, RoomTypesDal, RoomsDal>(sql, (roomsDal, roomTypesDal) =>
-					{
-						roomsDal.RoomType = roomTypesDal;
-						return roomsDal;
-					}).ToList();
-			}
+			var sql = @"SELECT * FROM Rooms AS r 
+						JOIN RoomTypes AS rt ON rt.Id = r.RoomTypeId";
 
+			IList<RoomsDal> roomsCollection = GetRooms(sql);
 			return roomsCollection;
 		}
 
 		public RoomsDal GetById(int id)
 		{
-			var sql = @"SELECT * FROM Rooms WHERE id = @id";
-			RoomsDal room;
+			var sql = $@"SELECT * FROM Rooms AS r
+						JOIN RoomTypes as rt ON rt.Id = r.RoomTypeId
+						WHERE r.Id = {id}";
+
+			RoomsDal room = GetRoom(sql);
+			return room;
+		}
+
+		private IList<RoomsDal> GetRooms(string sql)
+		{
+			IList<RoomsDal> rooms = new List<RoomsDal>();
+
 			using (IDbConnection connection = new SqlConnection(_connectionString))
 			{
-				room = connection.Query<RoomsDal>(sql, new { id }).FirstOrDefault();
+				rooms = connection.Query<RoomsDal, RoomTypesDal, RoomsDal>(sql, (roomsDal, roomTypesDal) =>
+				{
+					roomsDal.RoomType = roomTypesDal;
+					return roomsDal;
+				}).ToList();
+			}
+
+			return rooms;
+		}
+
+		private RoomsDal GetRoom(string sql)
+		{
+			RoomsDal room = new RoomsDal();
+
+			using (IDbConnection connection = new SqlConnection(_connectionString))
+			{
+				room = connection.Query<RoomsDal, RoomTypesDal, RoomsDal>(sql, (roomsDal, roomTypesDal) =>
+				{
+					roomsDal.RoomType = roomTypesDal;
+					return roomsDal;
+				}).ToList().FirstOrDefault();
 			}
 
 			return room;

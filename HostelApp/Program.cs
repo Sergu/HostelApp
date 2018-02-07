@@ -19,7 +19,11 @@ namespace HostelApp
 			var id = 2;
 			var res = roomRepository.GetById(id);
 			var roomsCollection = roomRepository.GetAll();
+			var romById = roomRepository.GetById(3);
 			var guests = guestsRepository.GetAll();
+
+			var activeGuests = guestsRepository.GetGuestsFromTimePeriod(DateTime.Now, DateTime.Now);
+			var guestById = guestsRepository.GetById(2);
 
 			Console.WriteLine($"RoomNumber: {res.RoomNumber} {res.RoomLetter ?? String.Empty}");
 
