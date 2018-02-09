@@ -9,8 +9,9 @@ namespace DAL.Models
 	public class RoomsDal : IDalEntity
 	{
 		public int Id { get; set; }
-		public string RoomNumber { get; set; }
+		public int RoomNumber { get; set; }
 		public RoomTypesDal RoomType { get; set; }
 		public string RoomLetter { get; set; }
+		public int Floor { get; set; }
 	}
 }

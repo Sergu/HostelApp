@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -13,7 +14,7 @@ namespace DAL.Repositories.Impl
 {
 	public class RoomsRepository : IRoomsRepository
 	{
-		public readonly string _connectionString;
+		private readonly string _connectionString;
 
 		public RoomsRepository(string connectionString)
 		{
@@ -28,7 +29,7 @@ namespace DAL.Repositories.Impl
 		public IList<RoomsDal> GetAll()
 		{
 			var sql = @"SELECT * FROM Rooms AS r 
-						JOIN RoomTypes AS rt ON rt.Id = r.RoomTypeId";
+							JOIN RoomTypes AS rt ON rt.Id = r.RoomTypeId";
 
 			IList<RoomsDal> roomsCollection = GetRooms(sql);
 			return roomsCollection;
@@ -37,11 +38,70 @@ namespace DAL.Repositories.Impl
 		public RoomsDal GetById(int id)
 		{
 			var sql = $@"SELECT * FROM Rooms AS r
-						JOIN RoomTypes as rt ON rt.Id = r.RoomTypeId
+							JOIN RoomTypes as rt ON rt.Id = r.RoomTypeId
 						WHERE r.Id = {id}";
 
 			RoomsDal room = GetRoom(sql);
 			return room;
+		}
+
+		public bool Create(RoomsDal item)
+		{
+			var sql = @"INSERT dbo.Rooms([RoomNumber],[RoomTypeId],[RoomLetter],[Floor]) 
+						VALUES (@roomNumber, @roomTypeId, @roomLetter, @floor)";
+
+			using (IDbConnection connection = new SqlConnection(_connectionString))
+			{
+				var rowsAffected = connection.Execute(sql,
+					new
+					{
+						roomNumber = item.RoomNumber,
+						roomTypeId = item.RoomType.Id,
+						roomLetter = item.RoomLetter,
+						floor = item.Floor
+					});
+
+				return rowsAffected > 0;
+			}
+		}
+
+		public bool Delete(int id)
+		{
+			var sql = @"DELETE FROM dbo.Rooms WHERE Id = @identifier;";
+
+			using (IDbConnection connection = new SqlConnection(_connectionString))
+			{
+				var rowsAffected = connection.Execute(sql, new
+				{
+					identifier = id
+				});
+
+				return rowsAffected > 0;
+			}
+		}
+
+		public bool Update(RoomsDal item)
+		{
+			var sql = @"UPDATE dbo.Rooms SET 
+							[RoomNumber] = @roomNumber, 
+							[RoomLetter] = @roomLetter,
+							[RoomTypeId] = @roomTypeId,
+							[Floor] = @floor
+						WHERE Id = @id";
+
+			using (IDbConnection connection = new SqlConnection(_connectionString))
+			{
+				var rowsAffected = connection.Execute(sql, new
+				{
+					roomNumber = item.RoomNumber,
+					roomTypeId = item.RoomType.Id,
+					roomLetter = item.RoomLetter,
+					floor = item.Floor,
+					id = item.Id
+				});
+
+				return rowsAffected > 0;
+			}
 		}
 
 		private IList<RoomsDal> GetRooms(string sql)
